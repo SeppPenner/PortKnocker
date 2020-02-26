@@ -12,19 +12,19 @@ PortKnocker is a project to run a simple [port knocking](https://en.wikipedia.or
 
 ## Basic usage
 ```cmd
-PortKnocker -i 192.168.0.1 -u 23					Knocks with UDP on 192.168.0.1:23.
-PortKnocker -i 192.168.0.1 -u 25 -u 26				Knocks with UDP on 192.168.0.1:25 and 192.168.0.1:26.
-PortKnocker -i 192.168.0.1 -u 38 -p test			Knocks with UDP on 192.168.0.1:38 and sends the string 'test'.
-PortKnocker -i 192.168.0.1 -u 40 -b 0103			Knocks with UDP on 192.168.0.1:40 and sends the hexadecimal value '0x01 0x03'.
-PortKnocker -i 192.168.0.1 -i 192.168.0.2 -u 23		Knocks with UDP on 192.168.0.1:23 and 192.168.0.2:23.
-PortKnocker -i 192.168.0.1 -t 24					Knocks with TCP on 192.168.0.1:24.
-PortKnocker -i 192.168.0.1 -t 32 -t 17				Knocks with TCP on 192.168.0.1:32 and 192.168.0.1:17.
-PortKnocker -i 192.168.0.1 -t 11 -p test			Knocks with TCP on 192.168.0.1:11 and sends the string 'test'.
-PortKnocker -i 192.168.0.1 -t 42 -b 0103			Knocks with TCP on 192.168.0.1:42 and sends the hexadecimal value '0x01 0x03'.
-PortKnocker -i 192.168.0.1 -i 192.168.0.2 -t 25		Knocks with TCP on 192.168.0.1:25 and 192.168.0.2:25.
+PortKnocker -i 192.168.0.1 -u 23                    Knocks with UDP on 192.168.0.1:23.
+PortKnocker -i 192.168.0.1 -u 25 -u 26              Knocks with UDP on 192.168.0.1:25 and 192.168.0.1:26.
+PortKnocker -i 192.168.0.1 -u 38 -p test            Knocks with UDP on 192.168.0.1:38 and sends the string 'test'.
+PortKnocker -i 192.168.0.1 -u 40 -b 0103            Knocks with UDP on 192.168.0.1:40 and sends the hexadecimal value '0x01 0x03'.
+PortKnocker -i 192.168.0.1 -i 192.168.0.2 -u 23     Knocks with UDP on 192.168.0.1:23 and 192.168.0.2:23.
+PortKnocker -i 192.168.0.1 -t 24                    Knocks with TCP on 192.168.0.1:24.
+PortKnocker -i 192.168.0.1 -t 32 -t 17              Knocks with TCP on 192.168.0.1:32 and 192.168.0.1:17.
+PortKnocker -i 192.168.0.1 -t 11 -p test            Knocks with TCP on 192.168.0.1:11 and sends the string 'test'.
+PortKnocker -i 192.168.0.1 -t 42 -b 0103            Knocks with TCP on 192.168.0.1:42 and sends the hexadecimal value '0x01 0x03'.
+PortKnocker -i 192.168.0.1 -i 192.168.0.2 -t 25     Knocks with TCP on 192.168.0.1:25 and 192.168.0.2:25.
 ```
 
-Checkout the examples in the `PortKnockerTest` project as well.
+Checkout the examples in the [PortKnockerTest](https://github.com/SeppPenner/PortKnocker/tree/master/PortKnockerTest) project as well.
 
 ## Hints
 The `-b` option will overwrite the `-p` option if both are specified.
