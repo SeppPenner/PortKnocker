@@ -1,7 +1,7 @@
 PortKnocker
 ====================================
 
-PortKnocker is a project to run a simple [port knocking](https://en.wikipedia.org/wiki/Port_knocking) client for UDP and TCP connections. The project was written and tested in .NetCore 3.1.
+PortKnocker is a project to run a simple [port knocking](https://en.wikipedia.org/wiki/Port_knocking) client for UDP and TCP connections. The project was written and tested in .Net 5.0.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/02q1t1mf09sk95n3?svg=true)](https://ci.appveyor.com/project/SeppPenner/portknocker)
 [![GitHub issues](https://img.shields.io/github/issues/SeppPenner/PortKnocker.svg)](https://github.com/SeppPenner/PortKnocker/issues)
@@ -76,4 +76,4 @@ Haemmer Electronics               Feb 26, 2020              Haemmer Electronics
 Change history
 --------------
 
-* **Version 1.0.0.0 (2020-02-26)** : 1.0 release.
+See the [Changelog](https://github.com/SeppPenner/PortKnocker/blob/master/Changelog.md).

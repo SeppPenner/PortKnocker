@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PortKnockerTest
+namespace PortKnocker.Tests
 {
     /// <summary>
     /// The program class to test the port knocker.
@@ -27,6 +27,7 @@ namespace PortKnockerTest
             TestPortKnockerHelpWithOtherOption();
             TestPortKnockerSingleIpAddress();
             TestPortKnockerMultipleIpAddresses();
+
             // Test UDP:
             TestPortKnockerSingleUdpPort();
             TestPortKnockerMultipleUdpPorts();
@@ -35,6 +36,7 @@ namespace PortKnockerTest
             TestPortKnockerSingleUdpPortWithSetBinaryPackage();
             TestPortKnockerMultipleUdpPortsWithSetBinaryPackage();
             TestPortKnockerMultipleUdpPortsWithSetBothPackages();
+
             // Test TCP:
             TestPortKnockerSingleTcpPort();
             TestPortKnockerMultipleTcpPorts();
@@ -43,6 +45,7 @@ namespace PortKnockerTest
             TestPortKnockerSingleTcpPortWithSetBinaryPackage();
             TestPortKnockerMultipleTcpPortsWithSetBinaryPackage();
             TestPortKnockerMultipleTcpPortsWithSetBothPackages();
+
             // Test mixed:
             TestPortKnockerMultiplePortsMixed();
             TestPortKnockerMultiplePortsMixedWithSetPackage();
@@ -54,7 +57,7 @@ namespace PortKnockerTest
         /// </summary>
         private static void TestPortKnockerSimple()
         {
-            PortKnocker.Program.Main(new string[]{});
+            PortKnocker.Program.Main(new string[] { });
         }
 
         /// <summary>

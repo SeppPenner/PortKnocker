@@ -7,15 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Globalization;
-
 namespace PortKnocker
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
+
     using Mono.Options;
 
     /// <summary>
@@ -37,10 +37,12 @@ namespace PortKnocker
             var udpPorts = new List<int>();
             var tcpPorts = new List<int>();
             var shouldShowHelp = false;
-            var packetData = new byte[]{ 0x00, 0x01 };
+            var packetData = new byte[] { 0x00, 0x01 };
 
-            var options = new OptionSet {
-                { "i|ip=", "Specifies the IP address(es).", ip =>
+            var options = new OptionSet
+            {
+                {
+                    "i|ip=", "Specifies the IP address(es).", ip =>
                     {
                         var trimmedIpAddress = ip.Trim();
                         var parsed = IPAddress.TryParse(trimmedIpAddress, out var ipAddress);
@@ -51,7 +53,8 @@ namespace PortKnocker
                         }
                     }
                 },
-                { "u|udp=", "Specifies the UDP connection port(s).", port =>
+                {
+                    "u|udp=", "Specifies the UDP connection port(s).", port =>
                     {
                         var trimmedPort = port.Trim();
                         var parsed = int.TryParse(trimmedPort, out var udpPort);
@@ -62,7 +65,8 @@ namespace PortKnocker
                         }
                     }
                 },
-                { "t|tcp=", "Specifies the TCP connection port(s).", port =>
+                {
+                    "t|tcp=", "Specifies the TCP connection port(s).", port =>
                     {
                         var trimmedPort = port.Trim();
                         var parsed = int.TryParse(trimmedPort, out var tcpPort);
@@ -73,18 +77,15 @@ namespace PortKnocker
                         }
                     }
                 },
-                { "p|packet=", "Specifies the packet.", packet =>
+                {
+                    "p|packet=", "Specifies the packet.", packet =>
                     {
                         var trimmedPacket = packet.Trim();
-                        var parsedPacketData = Encoding.UTF8.GetBytes(trimmedPacket);
-
-                        if (parsedPacketData != null)
-                        {
-                            packetData = parsedPacketData;
-                        }
+                        packetData = Encoding.UTF8.GetBytes(trimmedPacket);
                     }
                 },
-                { "b|binary=", "Specifies the packet.", packet =>
+                {
+                    "b|binary=", "Specifies the packet.", packet =>
                     {
                         var trimmedPacket = packet.Trim();
                         var parsedPacketData = ConvertHexStringToByteArray(trimmedPacket);
@@ -95,7 +96,8 @@ namespace PortKnocker
                         }
                     }
                 },
-                { "h|help", "Shows the help message.", h =>
+                {
+                    "h|help", "Shows the help message.", h =>
                     {
                         shouldShowHelp = h != null;
                     }
@@ -224,7 +226,7 @@ SEE ALSO
 AUTHORS
      PortKnocker is a free software provided under the MIT license. It is written by SeppPenner.
 
-Haemmer Electronics               Feb 26, 2020              Haemmer Electronics
+Hämmer Electronics               Feb 26, 2020              Hämmer Electronics
             ");
         }
 
@@ -245,6 +247,5 @@ $$ |      \$$$$$$  |$$ |       \$$$$  |$$ | \$$\ $$ |  $$ |\$$$$$$  |\$$$$$$$\ $
 
 PortKnocker — I'm the one who knocks.");
         }
-
     }
 }
