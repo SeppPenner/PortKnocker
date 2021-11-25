@@ -1,7 +1,7 @@
 PortKnocker
 ====================================
 
-PortKnocker is a project to run a simple [port knocking](https://en.wikipedia.org/wiki/Port_knocking) client for UDP and TCP connections. The project was written and tested in .Net 5.0.
+PortKnocker is a project to run a simple [port knocking](https://en.wikipedia.org/wiki/Port_knocking) client for UDP and TCP connections.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/02q1t1mf09sk95n3?svg=true)](https://ci.appveyor.com/project/SeppPenner/portknocker)
 [![GitHub issues](https://img.shields.io/github/issues/SeppPenner/PortKnocker.svg)](https://github.com/SeppPenner/PortKnocker/issues)
