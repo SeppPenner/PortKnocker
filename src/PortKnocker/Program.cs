@@ -21,14 +21,12 @@ namespace PortKnocker
     /// <summary>
     /// The main class.
     /// </summary>
-    // ReSharper disable once UnusedMember.Global
     public static class Program
     {
         /// <summary>
         /// The main method.
         /// </summary>
         /// <param name="args">The parameters.</param>
-        // ReSharper disable once UnusedMember.Global
         public static void Main(string[] args)
         {
             PrintAsciiArt();
@@ -47,7 +45,7 @@ namespace PortKnocker
                         var trimmedIpAddress = ip.Trim();
                         var parsed = IPAddress.TryParse(trimmedIpAddress, out var ipAddress);
 
-                        if (parsed && !ipAddress.Equals(default))
+                        if (parsed && ipAddress is not null && !ipAddress.Equals(default))
                         {
                             ipAddresses.Add(ipAddress);
                         }
