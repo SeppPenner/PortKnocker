@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Program.cs" company="Hämmer Electronics">
 // The project is licensed under the MIT license.
 // </copyright>
@@ -7,37 +7,28 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PortKnocker
+namespace PortKnocker;
+
+/// <summary>
+/// The main class.
+/// </summary>
+public static class Program
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Text;
-
-    using Mono.Options;
-
     /// <summary>
-    /// The main class.
+    /// The main method.
     /// </summary>
-    public static class Program
+    /// <param name="args">The parameters.</param>
+    public static void Main(string[] args)
     {
-        /// <summary>
-        /// The main method.
-        /// </summary>
-        /// <param name="args">The parameters.</param>
-        public static void Main(string[] args)
-        {
-            PrintAsciiArt();
+        PrintAsciiArt();
 
-            var ipAddresses = new List<IPAddress>();
-            var udpPorts = new List<int>();
-            var tcpPorts = new List<int>();
-            var shouldShowHelp = false;
-            var packetData = new byte[] { 0x00, 0x01 };
+        var ipAddresses = new List<IPAddress>();
+        var udpPorts = new List<int>();
+        var tcpPorts = new List<int>();
+        var shouldShowHelp = false;
+        var packetData = new byte[] { 0x00, 0x01 };
 
-            var options = new OptionSet
+        var options = new OptionSet
             {
                 {
                     "i|ip=", "Specifies the IP address(es).", ip =>
@@ -102,95 +93,95 @@ namespace PortKnocker
                 }
             };
 
-            try
-            {
-                options.Parse(args);
-            }
-            catch (OptionException ex)
-            {
-                Console.WriteLine($"{ex.Message}{ex.StackTrace}");
-                Console.WriteLine("Try `-h' for more information.");
-                return;
-            }
+        try
+        {
+            options.Parse(args);
+        }
+        catch (OptionException ex)
+        {
+            Console.WriteLine($"{ex.Message}{ex.StackTrace}");
+            Console.WriteLine("Try `-h' for more information.");
+            return;
+        }
 
-            if (shouldShowHelp)
-            {
-                PrintUsage();
-                return;
-            }
+        if (shouldShowHelp)
+        {
+            PrintUsage();
+            return;
+        }
 
-            var dataSent = false;
+        var dataSent = false;
 
-            foreach (var ipAddress in ipAddresses)
+        foreach (var ipAddress in ipAddresses)
+        {
+            foreach (var udpPort in udpPorts)
             {
-                foreach (var udpPort in udpPorts)
+                try
                 {
-                    try
-                    {
-                        var socketUdp = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-                        socketUdp.SendTo(packetData, new IPEndPoint(ipAddress, udpPort));
-                        Console.WriteLine($"Sent UDP packet '{BitConverter.ToString(packetData).Replace("-", string.Empty)}' to {ipAddress}:{udpPort}.");
-                        dataSent = true;
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
+                    var socketUdp = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                    socketUdp.SendTo(packetData, new IPEndPoint(ipAddress, udpPort));
+                    Console.WriteLine($"Sent UDP packet '{BitConverter.ToString(packetData).Replace("-", string.Empty)}' to {ipAddress}:{udpPort}.");
+                    dataSent = true;
                 }
-
-                foreach (var tcpPort in tcpPorts)
+                catch
                 {
-                    try
-                    {
-                        var socketTcp = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                        socketTcp.Connect(new IPEndPoint(ipAddress, tcpPort));
-                        socketTcp.Send(packetData);
-                        socketTcp.Shutdown(SocketShutdown.Both);
-                        socketTcp.Close();
-                        Console.WriteLine($"Sent TCP packet to {ipAddress}:{tcpPort}.");
-                        dataSent = true;
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
+                    // ignored
                 }
             }
 
-            if (dataSent)
+            foreach (var tcpPort in tcpPorts)
             {
-                Console.WriteLine("I've knocked for you.");
+                try
+                {
+                    var socketTcp = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    socketTcp.Connect(new IPEndPoint(ipAddress, tcpPort));
+                    socketTcp.Send(packetData);
+                    socketTcp.Shutdown(SocketShutdown.Both);
+                    socketTcp.Close();
+                    Console.WriteLine($"Sent TCP packet to {ipAddress}:{tcpPort}.");
+                    dataSent = true;
+                }
+                catch
+                {
+                    // ignored
+                }
             }
         }
 
-        /// <summary>
-        /// Converts a hexadecimal <see cref="string"/> to a <see cref="T:byte[]"/>.
-        /// </summary>
-        /// <param name="hexString">The hexadecimal <see cref="string"/>.</param>
-        /// <returns>The <see cref="T:byte[]"/>.</returns>
-        private static byte[] ConvertHexStringToByteArray(string hexString)
+        if (dataSent)
         {
-            if (hexString.Length % 2 != 0)
-            {
-                throw new ArgumentException($"The binary string cannot have an odd number of digits: {hexString}.");
-            }
+            Console.WriteLine("I've knocked for you.");
+        }
+    }
 
-            var data = new byte[hexString.Length / 2];
-            for (var index = 0; index < data.Length; index++)
-            {
-                var byteValue = hexString.Substring(index * 2, 2);
-                data[index] = byte.Parse(byteValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            }
-
-            return data;
+    /// <summary>
+    /// Converts a hexadecimal <see cref="string"/> to a <see cref="T:byte[]"/>.
+    /// </summary>
+    /// <param name="hexString">The hexadecimal <see cref="string"/>.</param>
+    /// <returns>The <see cref="T:byte[]"/>.</returns>
+    private static byte[] ConvertHexStringToByteArray(string hexString)
+    {
+        if (hexString.Length % 2 != 0)
+        {
+            throw new ArgumentException($"The binary string cannot have an odd number of digits: {hexString}.");
         }
 
-        /// <summary>
-        /// Prints out the usage documentation.
-        /// </summary>
-        private static void PrintUsage()
+        var data = new byte[hexString.Length / 2];
+        for (var index = 0; index < data.Length; index++)
         {
-            Console.WriteLine(@"
+            var byteValue = hexString.Substring(index * 2, 2);
+            data[index] = byte.Parse(byteValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        }
+
+        return data;
+    }
+
+    /// <summary>
+    /// Prints out the usage documentation.
+    /// </summary>
+    private static void PrintUsage()
+    {
+        Console.WriteLine(@"
 PortKnocker                   Commands manual                   PortKnocker
 
 NAME
@@ -226,14 +217,14 @@ AUTHORS
 
 Hämmer Electronics               Feb 26, 2020              Hämmer Electronics
             ");
-        }
+    }
 
-        /// <summary>
-        /// Prints out some ASCII art.
-        /// </summary>
-        private static void PrintAsciiArt()
-        {
-            Console.WriteLine(@"
+    /// <summary>
+    /// Prints out some ASCII art.
+    /// </summary>
+    private static void PrintAsciiArt()
+    {
+        Console.WriteLine(@"
 $$$$$$$\                       $$\     $$\   $$\                               $$\                           
 $$  __$$\                      $$ |    $$ | $$  |                              $$ |                          
 $$ |  $$ | $$$$$$\   $$$$$$\ $$$$$$\   $$ |$$  / $$$$$$$\   $$$$$$\   $$$$$$$\ $$ |  $$\  $$$$$$\   $$$$$$\  
@@ -244,6 +235,5 @@ $$ |      \$$$$$$  |$$ |       \$$$$  |$$ | \$$\ $$ |  $$ |\$$$$$$  |\$$$$$$$\ $
 \__|       \______/ \__|        \____/ \__|  \__|\__|  \__| \______/  \_______|\__|  \__| \_______|\__|              
 
 PortKnocker — I'm the one who knocks.");
-        }
     }
 }
