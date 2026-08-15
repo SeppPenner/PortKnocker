@@ -112,8 +112,8 @@ Do not silently "clean up" these, they are existing behaviour:
   not a number and a port outside `0` to `65535` are simply not added to their list. The tool then
   knocks on whatever is left, or on nothing at all, and says nothing about it.
 - **`-p` and `-b` write the same field.** Both callbacks assign `KnockOptions.PacketData`, so the
-  option that comes **last** on the command line wins. The `Hints` section of the `README.md`
-  claims that `-b` overwrites `-p`, which is only true for that order.
+  option that comes **last** on the command line wins. Up to version 1.0.6.0 the `Hints` section of
+  the `README.md` claimed that `-b` overwrites `-p`, which is only true for that order.
 - **`ConvertHexStringToByteArray` throws an `OptionException`.** That is the exception type of
   Mono.Options and not the obvious choice for a converter, but it is deliberate: the method runs
   inside a Mono.Options callback, and `Main` already reports an `OptionException` as a plain
@@ -129,8 +129,8 @@ Do not silently "clean up" these, they are existing behaviour:
 - **`Main` never sets an exit code.** Wrong arguments, a failed knock and a successful knock all
   end with `0`.
 - **The manual exists twice.** `PrintUsage` in `Program.cs` and the `Commands` block of the
-  `README.md` are copies of each other and have already drifted apart: the program prints
-  `Hämmer Electronics`, the readme writes `Haemmer Electronics`. Change both or none.
+  `README.md` are copies of each other and had already drifted apart once, the readme wrote
+  `Haemmer Electronics` where the program prints `Hämmer Electronics`. Change both or none.
 - **The em dash in the program output.** `PortKnocker — I'm the one who knocks.` is part of the
   ASCII art banner and of the manual. It is user facing text of the tool, not documentation, and
   stays as it is.

@@ -1,5 +1,6 @@
 # Change history
 
+* **Version 1.0.7.0 (2026-08-15)** : Updated nuget packages, moved to Net 10.0, fixed the crash on an invalid binary packet, build the tool as a console application, replaced the test project by MSTest unit tests.
 * **Version 1.0.6.0 (2025-01-09)** : Updated Nuget packages, added audit mode, moved to Net9.0.
 * **Version 1.0.5.0 (2024-01-04)** : Updated nuget packages, moved to Net 8.0.
 * **Version 1.0.4.0 (2022-11-23)** : Updated nuget packages, moved to Net 7.0.

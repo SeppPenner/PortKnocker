@@ -27,10 +27,12 @@ PortKnocker -i 192.168.0.1 -t 42 -b 0103            Knocks with TCP on 192.168.0
 PortKnocker -i 192.168.0.1 -i 192.168.0.2 -t 25     Knocks with TCP on 192.168.0.1:25 and 192.168.0.2:25.
 ```
 
-Checkout the examples in the [PortKnockerTest](https://github.com/SeppPenner/PortKnocker/tree/master/PortKnockerTest) project as well.
+Checkout the accepted argument combinations in the [PortKnocker.Tests](https://github.com/SeppPenner/PortKnocker/tree/master/src/PortKnocker.Tests) project as well.
 
 ## Hints
-The `-b` option will overwrite the `-p` option if both are specified.
+The `-p` option and the `-b` option write the same packet, so the one that is specified last wins.
+
+An invalid IP address and a port that is no number or outside the range from 0 to 65535 are skipped without a message. An invalid `-b` value is reported and stops the run.
 
 ## Commands
 
@@ -68,7 +70,7 @@ SEE ALSO
 AUTHORS
      PortKnocker is a free software provided under the MIT license. It is written by SeppPenner.
 
-Haemmer Electronics               Feb 26, 2020              Haemmer Electronics
+Hämmer Electronics               Feb 26, 2020              Hämmer Electronics
 ```
 
 ## Further links
