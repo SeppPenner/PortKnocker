@@ -11,17 +11,21 @@ themselves.
 
 One solution `src/PortKnocker.sln` with exactly two projects:
 
-- `src/PortKnocker/PortKnocker.csproj`, `OutputType` `WinExe`, the tool itself.
+- `src/PortKnocker/PortKnocker.csproj`, `OutputType` `Exe`, the tool itself.
 - `src/PortKnocker.Tests/PortKnocker.Tests.csproj`, `OutputType` `Exe`, a second console
   application that calls `PortKnocker.Program.Main` with hard coded arguments.
 
 Layout inside `src/PortKnocker`:
 
-- `Program.cs`: the whole tool. `Main` prints the ASCII art, builds a `Mono.Options.OptionSet` with
-  the six options `-i`, `-u`, `-t`, `-p`, `-b` and `-h`, parses the arguments and then loops over
-  the IP addresses, the UDP ports and the TCP ports and sends the packet. The private helpers
-  `ConvertHexStringToByteArray`, `PrintUsage` and `PrintAsciiArt` do one thing each, keep new logic
-  in that shape.
+- `Program.cs`: the entry point. `Main` prints the ASCII art, hands the arguments to the
+  `ArgumentParser`, reports an `OptionException` as a plain message and then either prints the
+  manual or knocks. The private helpers `Knock`, `PrintUsage` and `PrintAsciiArt` do one thing
+  each, keep new logic in that shape.
+- `ArgumentParser.cs`: the `Mono.Options.OptionSet` with the six options `-i`, `-u`, `-t`, `-p`,
+  `-b` and `-h`, plus the private `ConvertHexStringToByteArray`. Nothing in here touches the
+  network or the console, which is what makes it testable.
+- `Datatypes/KnockOptions.cs`: the result of the parsing, the IP addresses, the UDP and TCP ports,
+  the packet and the help flag.
 - `GlobalUsings.cs`: all usings of the project.
 
 Layout inside `src/PortKnocker.Tests`:
@@ -92,25 +96,21 @@ Do not silently "clean up" these, they are existing behaviour:
 - **Invalid input is dropped without a word.** An IP address that does not parse, a port that is
   not a number and a port outside `0` to `65535` are simply not added to their list. The tool then
   knocks on whatever is left, or on nothing at all, and says nothing about it.
-- **`-p` and `-b` write the same field.** Both callbacks assign `packetData`, so the option that
-  comes **last** on the command line wins. The `Hints` section of the `README.md` claims that `-b`
-  overwrites `-p`, which is only true for that order.
-- **An invalid `-b` value crashes the tool.** `ConvertHexStringToByteArray` throws
-  `ArgumentException` for an odd number of digits and `byte.Parse` throws `FormatException` for a
-  non hexadecimal digit. Both are thrown inside the Mono.Options callback, and `Main` only catches
-  `OptionException`, so `PortKnocker -i 127.0.0.1 -u 22 -b 112` ends in an unhandled exception with
-  a stack trace. The `if (parsedPacketData != null)` check below the call is dead code, the method
-  never returns null.
-- **The error output glues message and stack trace together.** The `catch (OptionException)` block
-  writes `$"{ex.Message}{ex.StackTrace}"` in one line, without a separator.
+- **`-p` and `-b` write the same field.** Both callbacks assign `KnockOptions.PacketData`, so the
+  option that comes **last** on the command line wins. The `Hints` section of the `README.md`
+  claims that `-b` overwrites `-p`, which is only true for that order.
+- **`ConvertHexStringToByteArray` throws an `OptionException`.** That is the exception type of
+  Mono.Options and not the obvious choice for a converter, but it is deliberate: the method runs
+  inside a Mono.Options callback, and `Main` already reports an `OptionException` as a plain
+  message. An `ArgumentException` or the `FormatException` of `byte.Parse` would leave the parse
+  loop unhandled and end in a stack trace, which is exactly the crash that version 1.0.7.0 fixed.
 - **TCP knocking needs a full connection.** The TCP branch calls `Socket.Connect` before `Send`, so
   a knock on a closed port throws and is swallowed by the empty `catch`. Classic TCP knocking only
   needs the SYN packet, which a `Socket` of type `Stream` cannot send on its own. UDP knocking has
   no such problem, `SendTo` succeeds without a listener.
-- **The sockets are never disposed.** Neither `socketUdp` nor `socketTcp` is wrapped in a `using`.
-  The process is short lived, so the handles die with it.
-- **`OutputType` is `WinExe` although the tool only writes to the console.** Started from Explorer
-  it therefore shows nothing at all.
+- **A knock that fails says nothing.** Both `catch` blocks are empty on purpose, because a knock on
+  a closed TCP port is the normal case and not an error worth printing. The consequence is that
+  `I've knocked for you.` stays away without any explanation when every knock failed.
 - **`Main` never sets an exit code.** Wrong arguments, a failed knock and a successful knock all
   end with `0`.
 - **The manual exists twice.** `PrintUsage` in `Program.cs` and the `Commands` block of the

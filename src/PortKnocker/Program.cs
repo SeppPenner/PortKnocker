@@ -22,105 +22,45 @@ public static class Program
     {
         PrintAsciiArt();
 
-        var ipAddresses = new List<IPAddress>();
-        var udpPorts = new List<int>();
-        var tcpPorts = new List<int>();
-        var shouldShowHelp = false;
-        var packetData = new byte[] { 0x00, 0x01 };
-
-        var options = new OptionSet
-            {
-                {
-                    "i|ip=", "Specifies the IP address(es).", ip =>
-                    {
-                        var trimmedIpAddress = ip.Trim();
-                        var parsed = IPAddress.TryParse(trimmedIpAddress, out var ipAddress);
-
-                        if (parsed && ipAddress is not null && !ipAddress.Equals(default))
-                        {
-                            ipAddresses.Add(ipAddress);
-                        }
-                    }
-                },
-                {
-                    "u|udp=", "Specifies the UDP connection port(s).", port =>
-                    {
-                        var trimmedPort = port.Trim();
-                        var parsed = int.TryParse(trimmedPort, out var udpPort);
-
-                        if (parsed && udpPort >= 0 && udpPort <= 65535)
-                        {
-                            udpPorts.Add(udpPort);
-                        }
-                    }
-                },
-                {
-                    "t|tcp=", "Specifies the TCP connection port(s).", port =>
-                    {
-                        var trimmedPort = port.Trim();
-                        var parsed = int.TryParse(trimmedPort, out var tcpPort);
-
-                        if (parsed && tcpPort >= 0 && tcpPort <= 65535)
-                        {
-                            tcpPorts.Add(tcpPort);
-                        }
-                    }
-                },
-                {
-                    "p|packet=", "Specifies the packet.", packet =>
-                    {
-                        var trimmedPacket = packet.Trim();
-                        packetData = Encoding.UTF8.GetBytes(trimmedPacket);
-                    }
-                },
-                {
-                    "b|binary=", "Specifies the packet.", packet =>
-                    {
-                        var trimmedPacket = packet.Trim();
-                        var parsedPacketData = ConvertHexStringToByteArray(trimmedPacket);
-
-                        if (parsedPacketData != null)
-                        {
-                            packetData = parsedPacketData;
-                        }
-                    }
-                },
-                {
-                    "h|help", "Shows the help message.", h =>
-                    {
-                        shouldShowHelp = h != null;
-                    }
-                }
-            };
+        KnockOptions knockOptions;
 
         try
         {
-            options.Parse(args);
+            knockOptions = ArgumentParser.Parse(args);
         }
         catch (OptionException ex)
         {
-            Console.WriteLine($"{ex.Message}{ex.StackTrace}");
+            Console.WriteLine(ex.Message);
             Console.WriteLine("Try `-h' for more information.");
             return;
         }
 
-        if (shouldShowHelp)
+        if (knockOptions.ShouldShowHelp)
         {
             PrintUsage();
             return;
         }
 
+        Knock(knockOptions);
+    }
+
+    /// <summary>
+    /// Sends the packet to every given port of every given IP address.
+    /// </summary>
+    /// <param name="knockOptions">The parsed <see cref="KnockOptions"/>.</param>
+    private static void Knock(KnockOptions knockOptions)
+    {
         var dataSent = false;
 
-        foreach (var ipAddress in ipAddresses)
+        foreach (var ipAddress in knockOptions.IpAddresses)
         {
-            foreach (var udpPort in udpPorts)
+            foreach (var udpPort in knockOptions.UdpPorts)
             {
                 try
                 {
-                    var socketUdp = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-                    socketUdp.SendTo(packetData, new IPEndPoint(ipAddress, udpPort));
-                    Console.WriteLine($"Sent UDP packet '{BitConverter.ToString(packetData).Replace("-", string.Empty)}' to {ipAddress}:{udpPort}.");
+                    using var socketUdp = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
+                    socketUdp.SendTo(knockOptions.PacketData, new IPEndPoint(ipAddress, udpPort));
+                    Console.WriteLine($"Sent UDP packet '{BitConverter.ToString(knockOptions.PacketData).Replace("-", string.Empty)}' to {ipAddress}:{udpPort}.");
                     dataSent = true;
                 }
                 catch
@@ -129,15 +69,14 @@ public static class Program
                 }
             }
 
-            foreach (var tcpPort in tcpPorts)
+            foreach (var tcpPort in knockOptions.TcpPorts)
             {
                 try
                 {
-                    var socketTcp = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    using var socketTcp = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     socketTcp.Connect(new IPEndPoint(ipAddress, tcpPort));
-                    socketTcp.Send(packetData);
+                    socketTcp.Send(knockOptions.PacketData);
                     socketTcp.Shutdown(SocketShutdown.Both);
-                    socketTcp.Close();
                     Console.WriteLine($"Sent TCP packet to {ipAddress}:{tcpPort}.");
                     dataSent = true;
                 }
@@ -152,28 +91,6 @@ public static class Program
         {
             Console.WriteLine("I've knocked for you.");
         }
-    }
-
-    /// <summary>
-    /// Converts a hexadecimal <see cref="string"/> to a <see cref="T:byte[]"/>.
-    /// </summary>
-    /// <param name="hexString">The hexadecimal <see cref="string"/>.</param>
-    /// <returns>The <see cref="T:byte[]"/>.</returns>
-    private static byte[] ConvertHexStringToByteArray(string hexString)
-    {
-        if (hexString.Length % 2 != 0)
-        {
-            throw new ArgumentException($"The binary string cannot have an odd number of digits: {hexString}.");
-        }
-
-        var data = new byte[hexString.Length / 2];
-        for (var index = 0; index < data.Length; index++)
-        {
-            var byteValue = hexString.Substring(index * 2, 2);
-            data[index] = byte.Parse(byteValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-        }
-
-        return data;
     }
 
     /// <summary>
