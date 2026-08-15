@@ -12,8 +12,7 @@ themselves.
 One solution `src/PortKnocker.sln` with exactly two projects:
 
 - `src/PortKnocker/PortKnocker.csproj`, `OutputType` `Exe`, the tool itself.
-- `src/PortKnocker.Tests/PortKnocker.Tests.csproj`, `OutputType` `Exe`, a second console
-  application that calls `PortKnocker.Program.Main` with hard coded arguments.
+- `src/PortKnocker.Tests/PortKnocker.Tests.csproj`, MSTest, rewritten in version 1.0.7.0.
 
 Layout inside `src/PortKnocker`:
 
@@ -30,10 +29,17 @@ Layout inside `src/PortKnocker`:
 
 Layout inside `src/PortKnocker.Tests`:
 
-- `Program.cs`: 22 methods named `TestPortKnocker*`, each one a call of `PortKnocker.Program.Main`
-  with a different argument list. There is no test framework, no assertion and no result, the
-  methods really send packets to `192.168.2.1`. `dotnet test` finds nothing here.
-- `GlobalUsings.cs`: empty apart from the pragma block.
+- `ArgumentParserTests.cs`: the defaults, the IP addresses (single, several, IPv6, invalid), the
+  ports (several, both range ends, out of range, no number), both packet options and their order,
+  the two hexadecimal errors, a missing option value, the help flag, the long option names and an
+  unknown option. It is the only test class, because `ArgumentParser` is the only part of the tool
+  that can be tested without a network.
+- `GlobalUsings.cs`: all usings of the test project.
+
+Up to version 1.0.6.0 this project was a second console application whose `Main` called
+`PortKnocker.Program.Main` 22 times with different arguments and really sent packets to
+`192.168.2.1`. There was no test framework, no assertion and no result, `dotnet test` found nothing
+there. Do not bring that shape back.
 
 Repository root: `README.md` (the only user documentation, with the usage samples and the commands
 manual), `Changelog.md`, `License.txt` (MIT), `.gitattributes` and `.gitignore`. The code style
@@ -43,6 +49,10 @@ lives in `src/.editorconfig`. There is no `Updating.md`, no `HowToUse.md` and no
 
 ```powershell
 dotnet build src/PortKnocker.sln
+```
+
+```powershell
+dotnet test src/PortKnocker.sln
 ```
 
 - Single target framework `net10.0` in both projects, no multi-targeting, no `RuntimeIdentifiers`.
@@ -59,10 +69,15 @@ dotnet build src/PortKnocker.sln
 - Restore needs nuget.org. If a private feed is configured globally on the machine and answers 404
   for public packages, restore fails with `NU1301`. Then build with an explicit source:
   `dotnet build src/PortKnocker.sln --source https://api.nuget.org/v3/index.json`.
-- There are no automated tests. A behaviour change is verified by running the tool, for example
+- Tests are MSTest, in the single test project `src/PortKnocker.Tests`, which follows the same
+  package set as the sibling repositories: `Microsoft.NET.Test.Sdk`, `MSTest.TestAdapter`,
+  `MSTest.TestFramework`, `coverlet.collector` and `GitVersion.MsBuild`. `dotnet test` runs 23
+  tests. They only call `ArgumentParser.Parse`, so they open no socket, need no network and leave
+  the working tree untouched. Never claim a test run happened without running it.
+- Beyond the tests, a behaviour change is verified by running the tool, for example
   `dotnet run --project src/PortKnocker -- -h` for the manual and
   `dotnet run --project src/PortKnocker -- -i 127.0.0.1 -u 40000` for a knock that reports
-  `Sent UDP packet '0001' to 127.0.0.1:40000.`. Never claim a run happened without running it.
+  `Sent UDP packet '0001' to 127.0.0.1:40000.`.
 
 ## Code conventions
 
