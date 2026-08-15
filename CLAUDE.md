@@ -45,7 +45,7 @@ lives in `src/.editorconfig`. There is no `Updating.md`, no `HowToUse.md` and no
 dotnet build src/PortKnocker.sln
 ```
 
-- Single target framework `net9.0` in both projects, no multi-targeting, no `RuntimeIdentifiers`.
+- Single target framework `net10.0` in both projects, no multi-targeting, no `RuntimeIdentifiers`.
   Nothing in the code is Windows specific.
 - All build properties live directly in the two `.csproj` files and are duplicated there. There is
   **no** `Directory.Build.props` in this repository.
